@@ -1,0 +1,38 @@
+ <!--  Dialog model for assiging tasks -->>
+
+ <p-dialog header="Assign Task" [modal]="true" [visible]="service.visible()" [style]="{ width: '25rem' }">
+    <span class="p-text-secondary block mb-8">Please choose an employe to assign task.</span>
+
+    <ul>
+        @if (service.users().length === 0) {
+            <li><h1>No users yet</h1></li>
+        }
+        @else {
+            @for(user of service.users(); track $index){
+                <li (click)="assignTaskToEmployee(service.taskToAssignId(), user.id)" class="employee-item-to-assign">
+
+                    <div>
+                        <b>{{user?.username}}</b>
+                    </div>
+
+                    @if (!user?.attributes?.taskid || user?.attributes?.taskid?.length === 0) {
+                        <div style="color: green;">
+                            <b>FREE</b>
+                        </div>
+                    }
+                    @else {
+                        <div style="color: orangered;">
+                            <b>OCCUPIED({{user?.attributes?.taskid?.length}})</b>
+                        </div>
+                    }
+                </li>
+            }
+        }
+    </ul>
+
+    <div class="flex justify-end gap-2">
+        <p-button label="Cancel" severity="secondary" (click)="service.visible.set(false)" />
+    </div>
+    
+</p-dialog>
+

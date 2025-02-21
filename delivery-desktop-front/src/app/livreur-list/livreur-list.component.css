@@ -1,0 +1,29 @@
+
+.user-container{
+    
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #E0E0E0;
+    line-height: 1.6;
+}
+.user-container ul{
+    margin-left: -40px;
+}
+
+.employee-item-to-assign{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 10px;
+    border: .5px solid #ddd;
+    cursor: pointer;
+}

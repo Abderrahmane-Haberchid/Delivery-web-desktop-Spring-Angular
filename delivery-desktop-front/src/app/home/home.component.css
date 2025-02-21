@@ -1,0 +1,224 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+}
+.wrapper{
+    margin: 20px;
+}
+.container{
+    display: flex;
+    flex-direction: row;
+    max-width: 85%;
+    gap: 20px;
+    margin: 20px;
+}
+.header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.task-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 85%;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #E0E0E0;
+    line-height: 1.6;
+}
+.task-container h2{
+    margin-left: 40px;
+}
+.task-form{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+input[type="text"] {
+    width: 70%;
+    height: 30px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-right: 0px;
+    border-radius: 10px 0px 0px 10px;
+}
+
+
+button {
+    width: 20%;
+    height: 31px;
+    background-color: #4CAF50;
+    color: #fff;
+    font-size: 17px;
+    border: none;
+    border-radius: 0px 10px 10px 0px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #3e8e41;
+}
+.task-list-header{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-evenly;
+    margin-bottom: 10px;
+    margin-top: 20px;
+}
+.task-list-header h3{
+    cursor: pointer;
+}
+.task-list-header h3:hover{
+    text-decoration: underline;
+}
+#task-list{
+    list-style-type: none;
+    padding: 15px;
+}
+.div-task-item{
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    align-items: center;
+    width: 100%;
+    gap: 20px;
+}
+.task-body{
+    width: 70%;
+}
+.task-actions-btn{
+    width: 30%;
+}
+
+ul li{
+    list-style: none;
+}
+
+.task-item-unassigned{
+    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    color: green;
+}
+
+.task-item-assigned{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #3563ed;
+}
+
+
+.span-action{
+    cursor: pointer;
+    background-color: #ddd;
+    padding: 8px;
+    margin-right: 10px;
+    color: black;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+
+.task-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 60%;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #E0E0E0;
+    line-height: 1.6;
+}
+
+.user-assigned-task{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    color: green;
+}
+.mark-as-completed{
+    text-align: center;
+    background-color: #ddd;
+    color: black;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 20%;
+}
+
+.task-item-completed{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: #4CAF50;
+}
+.delete-completed-task-btn{
+    background-color: white; 
+    padding: 10px; 
+    cursor: pointer; 
+    border-radius: 10px;
+    color: black;
+}
+
+/* here start user section csss */ 
+.completed-task-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 40%;
+    margin: 40px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    font-family: 'Roboto', sans-serif;
+    background-color: #121212;
+    color: #E0E0E0;
+    line-height: 1.6;
+}
+
+.completed-task-li{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4CAF50;
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.reassign-task{
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 30%;
+    color: #4CAF50;
+    text-align: center;
+}
+
+/* =============End of user section style============== */

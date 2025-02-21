@@ -1,0 +1,31 @@
+
+
+<div class="user-container">
+    <h2>Livreurs({{service.users().length}})</h2>
+    <ul>
+        @if (service.users().length === 0) {
+            <li><h1>No users yet</h1></li>
+        }
+        @else {
+            @for(user of service.users(); track $index){
+                <li class="employee-item-to-assign">
+                    
+                        <div>
+                            <b>{{user?.username}}</b>
+                        </div> 
+                            @if (!user?.attributes?.taskid || user?.attributes?.taskid?.length === 0) {
+                                <div style="color: green;">
+                                    <b>FREE</b>
+                                </div>
+                            }
+                            @else {
+                                <div style="color: orangered;">
+                                    <b>OCCUPIED({{user?.attributes?.taskid?.length}})</b>
+                                </div>
+                            }
+                   
+                </li>
+            }   
+        }
+    </ul>
+</div>
