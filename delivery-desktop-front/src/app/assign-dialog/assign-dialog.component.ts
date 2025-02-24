@@ -1,37 +1,46 @@
+import { Status } from './../../../node_modules/@inquirer/core/dist/commonjs/lib/theme.d';
 import { Component, inject } from '@angular/core';
 import { ServicesService } from '../services/services.service';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { ToastrService } from 'ngx-toastr';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-assign-dialog',
-  imports: [FormsModule, DialogModule, ButtonModule],
+  imports: [FormsModule, DialogModule, ButtonModule, ToastModule],
   templateUrl: './assign-dialog.component.html',
-  styleUrl: './assign-dialog.component.css'
+  styleUrl: './assign-dialog.component.css',
+  providers: [MessageService]
 })
 export class AssignDialogComponent {
 
   service = inject(ServicesService);
-  toastr = inject(ToastrService);
+  toast = inject(MessageService);
 
   visible: any;
 
 
   assignTaskToEmployee(taskId: string|undefined, userId: string|undefined) {
     this.service.assignTaskToEmployee(taskId, userId).subscribe({
-      next: () => {
-        this.toastr.success('Task Assigned !', 'Success');
+      next: (res) => {
+        this.toast.add({
+          severity: 'success',
+          summary: 'Succes',
+          detail: 'Commande assignée !'
+        })
         this.service.visible.set(false);
         this.getAllTasks();
         this.getAllUser();
+        
       },
-      error: (err) => {
-        this.toastr.error('Error assigning task', 'Error');
-        this.service.visible.set(false);
-        this.getAllTasks();
-        this.getAllUser();
+      error: () => {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Merci de réessayer plus tard !'
+        })
       }
     });
   }
@@ -53,7 +62,11 @@ export class AssignDialogComponent {
         
       },
       error: () => {
-        this.toastr.error('Error loading users', 'Error');
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Pas possible de charger les livreurs, merci de réessayer!'
+        })
       }
     });
   }
@@ -82,7 +95,11 @@ export class AssignDialogComponent {
         
       },
       error: () => {
-        this.toastr.error('Error loading tasks', 'Error');
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Pas possible de charger les commandes, merci de réessayer!'
+        })
       }
     });
   }

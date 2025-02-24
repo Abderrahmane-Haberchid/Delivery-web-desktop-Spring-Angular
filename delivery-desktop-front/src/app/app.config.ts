@@ -1,3 +1,4 @@
+
 import { ApplicationConfig, provideExperimentalZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -5,10 +6,10 @@ import { AutoRefreshTokenService, INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG, inclu
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
 import { provideAnimations } from '@angular/platform-browser/animations';
-import { provideToastr } from 'ngx-toastr';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
+
 
 
 export const provideKeycloakAngular = () =>
@@ -39,7 +40,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
     provideExperimentalZonelessChangeDetection(),
     provideAnimations(), // required animations providers
-    provideToastr(), // Toastr providers
+    providePrimeNG(),
     {
       provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
       useValue: [
@@ -57,4 +58,5 @@ export const appConfig: ApplicationConfig = {
         })
   ],
 };
+
 

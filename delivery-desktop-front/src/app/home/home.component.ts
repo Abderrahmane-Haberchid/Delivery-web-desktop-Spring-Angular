@@ -1,46 +1,55 @@
+
 import Keycloak from 'keycloak-js';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ServicesService } from '../services/services.service';
-import { ToastrService } from 'ngx-toastr';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import { MessageService } from 'primeng/api';
 import { AssignDialogComponent } from "../assign-dialog/assign-dialog.component";
 import { LivreurListComponent } from "../livreur-list/livreur-list.component";
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   standalone: true,
   selector: 'app-home',
-  imports: [FormsModule, DialogModule, ButtonModule, AssignDialogComponent, LivreurListComponent], 
+  imports: [FormsModule, DialogModule, ButtonModule, AssignDialogComponent, LivreurListComponent, ToastModule], 
   templateUrl: './home.component.html',
-  styleUrl: './home.component.css'
+  styleUrl: './home.component.css',
+  providers: [MessageService]
 })
 export class HomeComponent implements OnInit {
 
-  constructor() { 
-    this.getAllTasks(); 
-    this.getAllUser();
-    
-    if(this.keycloak?.tokenParsed && this.keycloak?.tokenParsed?.resource_access){
-      this.userRoles = this.keycloak?.tokenParsed?.resource_access["realm-management"]?.roles;
-    }
-    this.getUsername();
-    this.getEmployeeId();
-  }
-  ngOnInit(): void {
-      console.log(this.keycloak.tokenParsed);
+
+   // Dependecy injection here
+   service = inject(ServicesService);
+   toast = inject(MessageService);
+   readonly keycloak = inject(Keycloak);
+
+    ngOnInit(): void {
+
+      this.getAllTasks(); 
+        this.getAllUser();
+        
+        if(this.keycloak?.tokenParsed && this.keycloak?.tokenParsed?.resource_access){
+          this.userRoles = this.keycloak?.tokenParsed?.resource_access["realm-management"]?.roles;
+        }
+        this.getUsername();
+        this.getEmployeeId();
+
+        setInterval(() => {
+          this.getAllTasks(); 
+          console.log("Tasks reloaded from backend");
+          
+        }, 5000);
        
   }
+  
 
 showDialog(taskId: string|undefined) {
   this.service.visible.set(true);
   this.service.taskToAssignId.set(taskId);
 }
-
-  // Dependecy injection here
-  service = inject(ServicesService);
-  toastr = inject(ToastrService);
-  readonly keycloak = inject(Keycloak);
 
   // Signals for two-way binding
   taskTitle = signal<string>('');
@@ -77,10 +86,18 @@ showDialog(taskId: string|undefined) {
         this.getAllTasks(); 
         this.taskTitle.set(''); 
         this.taskDescription.set('');
-        this.toastr.success('Task Added !', 'Success');
+        this.toast.add({
+          severity: 'success',
+          summary: 'Info',
+          detail: 'Commande Ajouté !'
+        })
       },
-      error: (error) => {
-        this.toastr.error('Error saving task', 'Error');
+      error: () => {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Problème generé lors la connexion au base de donnée !'
+        })
       }
     });
   }
@@ -109,7 +126,11 @@ showDialog(taskId: string|undefined) {
         
       },
       error: () => {
-        this.toastr.error('Error loading tasks', 'Error');
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Pas possible de charger les commandes !'
+        })
       }
     });
   }
@@ -118,10 +139,18 @@ showDialog(taskId: string|undefined) {
     this.service.deleteTask(taskId).subscribe({
         next: () => {
           this.getAllTasks();
-          this.toastr.success('Task Deleted !', 'Success!');
+          this.toast.add({
+            severity: 'info',
+            summary: 'Info',
+            detail: 'Commande Supprimée !'
+          })
         },
-        error: (error) => {
-          this.toastr.error('Error deleting task', 'Error');
+        error: () => {
+          this.toast.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: 'Pas possible supprimer la commande, merci de réessayer !'
+          })
           }
     });
   }
@@ -142,7 +171,11 @@ showDialog(taskId: string|undefined) {
         
       },
       error: () => {
-        this.toastr.error('Error loading users', 'Error');
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Pas possible de charger les livreurs, merci de réessayer !'
+        })
       }
     });
   }
@@ -160,15 +193,22 @@ showDialog(taskId: string|undefined) {
   unassignTaskFromEmpl(taskId: string|undefined, userId: string|undefined) {
     this.service.unassignTaskFromEmployee(taskId, userId).subscribe({
       next: () => {
-        this.toastr.success('Task Unassigned !', 'Success');
-        this.service.visible.set(false);
+          this.getAllTasks();
+          this.getAllUser();
+          this.service.visible.set(false);
+          this.toast.add({
+            severity: 'success',
+            summary: 'Info',
+            detail: 'Commande déassigné avec succes !'
+          })
       },
-      error: (err) => {
-        this.toastr.error('Error unassigning task', 'Error');
-        this.service.visible.set(false);
-        this.getAllTasks();
-        this.getAllUser();
-      }
+      error: () => {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: "Pas possible d'annuler l'assignement, merci de réessayer !"
+        });
+        }
     });
   }
 
@@ -180,12 +220,19 @@ showDialog(taskId: string|undefined) {
   markAsCompletedTask(taskId: string|undefined) {
     this.service.markAsCompletedTask(taskId).subscribe({
       next: () => {
-        this.toastr.success('Task Completed !', 'Success');
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: 'Commande Livrée !'
+        })
         this.getAllTasks();
       },
-      error: (err) => {
-        this.toastr.error('Error completing task', 'Error');
-        this.getAllTasks();
+      error: () => {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Merci de réessayer plus tard !'
+        })
       }
     });
   }
@@ -193,12 +240,19 @@ showDialog(taskId: string|undefined) {
   markAsUncompletedTask(taskId: string|undefined) {
     this.service.markAsUncompletedTask(taskId).subscribe({
       next: () => {
-        this.toastr.success('Task Reassingned to you !', 'Success');
+        this.toast.add({
+          severity: 'info',
+          summary: 'Info',
+          detail: 'Commande vous a été réassigné !'
+        })
         this.getAllTasks();
       },
-      error: (err) => {
-        this.toastr.error('Error uncompleting task', 'Error');
-        this.getAllTasks();
+      error: () => {
+        this.toast.add({
+          severity: 'error',
+          summary: 'Erreur',
+          detail: 'Merci de réessayer plus tard !'
+        })
       }
     });
   }
