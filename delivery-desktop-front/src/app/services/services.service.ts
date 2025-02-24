@@ -1,8 +1,13 @@
+import { bold } from './../../../node_modules/@colors/colors/index.d';
+import { error } from './../../../node_modules/ajv/lib/vocabularies/applicator/dependencies';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ITask } from '../interfaces/ITask';
 import { IUser } from '../interfaces/IUser';
+import SockJS from 'sockjs-client';
+import * as Stomp from 'stompjs';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +44,33 @@ export class ServicesService {
     visible = signal<boolean>(false);
 
     taskToAssignId = signal<string|undefined>('') ;
+
+    private stompClient: any;
+    private _taskUpdates$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+    public taskUpdates$: Observable<any> = this._taskUpdates$.asObservable();
+
+  connect(){
+    const socket = new SockJS('http://localhost:8081');
+    this.stompClient = Stomp.over(socket);
+
+    this.stompClient.connect({}, () => {
+        console.log("Connected to websocket");
+
+        this.stompClient.subscribe('/topic/assigned-task', (message:any) => {
+            try{
+              const updateResponse = JSON.parse(message.body);
+              this._taskUpdates$.next(updateResponse);
+            }
+            catch(error){
+              console.error("Error parsing Websocket message", error, message.body)
+            }
+        }, 
+        (error: any) => {
+          console.error('WebSocket connection error:', error);
+        });
+        
+    });
+  }  
 
 
   saveTask(task: ITask): Observable<ITask>{
