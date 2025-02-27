@@ -27,8 +27,11 @@ public class WebSecurity {
                         .csrf(AbstractHttpConfigurer::disable)
                         .cors(Customizer.withDefaults())
                         .authorizeHttpRequests(request ->
-                                request.anyRequest().authenticated())
+                                request.requestMatchers("/socket-task/**").permitAll()
+                                .anyRequest().authenticated()
+                        )
                         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionManagement(session -> session.sessionCreationPolicy((SessionCreationPolicy.IF_REQUIRED)))
                         .oauth2ResourceServer(oauth -> oauth.jwt(
                                 jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter())
                         ))

@@ -8,7 +8,7 @@
         }
         @else {
             @for(user of service.users(); track $index){
-                <li class="employee-item-to-assign">
+                <li class="employee-item-to-assign" (click)="service.showUserDialog.set(true)">
                     
                         <div>
                             <b>{{user?.username}}</b>

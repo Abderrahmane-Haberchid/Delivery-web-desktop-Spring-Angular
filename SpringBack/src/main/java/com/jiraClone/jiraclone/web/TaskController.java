@@ -1,5 +1,6 @@
 package com.jiraClone.jiraclone.web;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.jiraClone.jiraclone.response.TaskResponse;
 import com.jiraClone.jiraclone.Enum.Status;
 import com.jiraClone.jiraclone.dto.TaskDto;
@@ -9,6 +10,8 @@ import com.jiraClone.jiraclone.services.impl.KeycloakServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -89,4 +92,11 @@ public class TaskController {
             return new ResponseEntity<>(task, HttpStatus.BAD_REQUEST);
 
     }
+
+//    @MessageMapping("/test-msg")
+//    @SendTo("/topic/test")
+//    public String testMethod(String msg){
+//        System.out.println("msg = " + msg);
+//        return "Hello your test is working perfelctly";
+//    }
 }

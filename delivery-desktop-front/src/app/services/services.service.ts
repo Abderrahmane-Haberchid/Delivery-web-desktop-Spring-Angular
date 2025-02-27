@@ -1,5 +1,5 @@
-import { bold } from './../../../node_modules/@colors/colors/index.d';
-import { error } from './../../../node_modules/ajv/lib/vocabularies/applicator/dependencies';
+import { Send } from './../../../node_modules/@types/express/node_modules/@types/express-serve-static-core/index.d';
+
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -7,7 +7,6 @@ import { ITask } from '../interfaces/ITask';
 import { IUser } from '../interfaces/IUser';
 import SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -41,36 +40,43 @@ export class ServicesService {
     employeeAssignedTasks = signal<ITask[]>([]);
     employeeCompletedTasks = signal<ITask[]>([]);
 
+    // showing dialog to assign task
     visible = signal<boolean>(false);
-
+    // showing delivery guy details dialog
+    showUserDialog = signal<boolean>(false);
+    
     taskToAssignId = signal<string|undefined>('') ;
-
+    
     private stompClient: any;
-    private _taskUpdates$: BehaviorSubject<any> = new BehaviorSubject<any>(null);
-    public taskUpdates$: Observable<any> = this._taskUpdates$.asObservable();
+    private rootUrl: string = "http://localhost:8081";
 
-  connect(){
-    const socket = new SockJS('http://localhost:8081');
-    this.stompClient = Stomp.over(socket);
+    // connectSocket() {
 
-    this.stompClient.connect({}, () => {
-        console.log("Connected to websocket");
+    //     const socket = new SockJS(this.rootUrl + '/socket-task');
 
-        this.stompClient.subscribe('/topic/assigned-task', (message:any) => {
-            try{
-              const updateResponse = JSON.parse(message.body);
-              this._taskUpdates$.next(updateResponse);
-            }
-            catch(error){
-              console.error("Error parsing Websocket message", error, message.body)
-            }
-        }, 
-        (error: any) => {
-          console.error('WebSocket connection error:', error);
-        });
-        
-    });
-  }  
+    //     this.stompClient = Stomp.over(socket);
+
+    //     this.stompClient.debug = () => { 
+    //         console.log("Error connecting socket to backend:");
+            
+    //     }; 
+  
+    //     this.stompClient.connect({}, () => {
+
+    //       this.stompClient.subscribe(`/topic/assigned-task`, (message:any) => {
+    //           console.log("==========> An Update received from backend", message.body);
+              
+    //       });
+  
+    //       this.stompClient.send('/app/test-msg',
+    //         JSON.stringify({ msg: "this is a msg from front via socket" ,action: 'connected' }));
+    //     }, 
+    //       (error:any) => {
+    //         console.log("Error while connecting to back");
+            
+    //       });
+
+    // }
 
 
   saveTask(task: ITask): Observable<ITask>{

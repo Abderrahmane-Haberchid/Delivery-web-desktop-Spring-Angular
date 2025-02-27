@@ -9,12 +9,13 @@ import { MessageService } from 'primeng/api';
 import { AssignDialogComponent } from "../assign-dialog/assign-dialog.component";
 import { LivreurListComponent } from "../livreur-list/livreur-list.component";
 import { ToastModule } from 'primeng/toast';
-import { Subscription } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
+import { LivreurDetailsComponent } from "../livreur-details/livreur-details.component";
 
 @Component({
   standalone: true,
   selector: 'app-home',
-  imports: [FormsModule, DialogModule, ButtonModule, AssignDialogComponent, LivreurListComponent, ToastModule], 
+  imports: [FormsModule, DialogModule, ButtonModule, AssignDialogComponent, LivreurListComponent, ToastModule, LivreurDetailsComponent], 
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
   providers: [MessageService]
@@ -27,19 +28,21 @@ export class HomeComponent implements OnInit {
    toast = inject(MessageService);
    readonly keycloak = inject(Keycloak);
 
-   private taskUpdateSubscription: Subscription | undefined;
+   private subscription: Subscription | undefined;
 
     ngOnInit(): void {
 
-      this.service.connect();
+      console.log("connecttion will start now");
 
-      this.taskUpdateSubscription = this.service.taskUpdates$.subscribe((responseUpdate) => {
-        if(responseUpdate){
-          console.log("Task assigned notification from backend");
-          console.log("Now we can do an action");
-          
+      this.subscription = interval(1000).subscribe({
+        next: () => {
+          this.getAllTasks();
+          this.getAllUser();
         }
+
       })
+      
+     // this.service.connectSocket();
 
       this.getAllTasks(); 
         this.getAllUser();
@@ -262,5 +265,9 @@ showDialog(taskId: string|undefined) {
         })
       }
     });
+  }
+
+  ngOnDestroy(){
+    this.subscription?.unsubscribe();
   }
 }
