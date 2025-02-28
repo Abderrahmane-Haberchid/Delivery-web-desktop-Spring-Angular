@@ -1,6 +1,7 @@
 export interface ITask {
     id?: string;
-    title: string;
+    adresse: string;
+    price: number|undefined;
     description: string;
     status: string;
     created_at?: Date;

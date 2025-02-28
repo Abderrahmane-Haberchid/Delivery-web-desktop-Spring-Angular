@@ -10,7 +10,7 @@
             <h1>Delivery Manager</h1>
         </div>
         <div>
-            <a (click)="disconnect()" style="cursor: pointer;">
+            <a (click)="disconnect()" style="color: white; cursor: pointer; background-color: orangered; padding: 10px; border-radius: 8px;">
                 Disconnect
             </a>
         </div>
@@ -18,110 +18,12 @@
     </div>
 
     @if (userRoles?.includes('realm-admin')) {
+
+    <h1 style="margin-left: 5%;">Total: {{service.totalAmount()}} DH</h1>
     <div class="container">
 
-        <div class="task-container">
-            <h2>Ajouter une livraison</h2>
-            <div class="task-form">
-                <input type="text" name="taskTitle" id="task-title" placeholder="Task title" [(ngModel)]="taskTitle">
-                <button id="add-btn" (click)="saveTask()">
-                    Add Task
-                </button>
-            </div>
-            
-            <div class="task-list-header">
-                <h3 (click)="taskSwitcherHandler('UNASSIGNED')"
-                    [style]="taskSwitcher() === 'UNASSIGNED' ? 'text-decoration:underline' : 'text-decoration:none'">
-                    Unassigned Tasks ({{service.tasksUnassigned().length}}) 
-                </h3>
-                <h3 (click)="taskSwitcherHandler('ASSIGNED')" 
-                    [style]="taskSwitcher() === 'ASSIGNED' ? 'text-decoration:underline' : 'text-decoration:none'">
-                    Assigned Tasks ({{service.tasksAssigned().length}}) 
-                </h3>
-                <h3 (click)="taskSwitcherHandler('COMPLETED')" 
-                    [style]="taskSwitcher() === 'COMPLETED' ? 'text-decoration:underline' : 'text-decoration:none'">
-                    Completed Tasks ({{service.tasksCompleted().length}}) 
-                </h3>
-            </div>
-            
-            <ul id="task-list">
-                
-                @if (taskSwitcher() === 'UNASSIGNED') {
-                    @if (service.tasksUnassigned().length === 0) {
-                        <li><h1>No tasks yet</h1></li>
-                    }
-                    @else {
-                        
-                        @for(task of service.tasksUnassigned(); track $index){
-                            <li class='task-item-unassigned'>
-                                <div class="div-task-item">
-                                    <div class="task-body">
-                                        <b>{{ $index }}</b> : <span><b>{{task.title}}</b></span>
-                                    </div>
-                                    <div class="task-actions-btn">
-                                        <span
-                                              class="span-action"
-                                              (click)="showDialog(task.id)"  >
-                                              Assign
-                                            </span>
-                                        <span (click)="delete(task.id)" class="span-action">Delete</span>
-                                    </div>
-                                </div>
-                                
-                            </li>
-                        }
-                    }   
-                }
-
-                @if (taskSwitcher() === 'ASSIGNED') {
-                    @if (service.tasksAssigned().length === 0) {
-                        <li><h1>No tasks yet</h1></li>
-                    }
-                    @else {
-                        
-                        @for(task of service.tasksAssigned(); track $index){
-                            <li class='task-item-assigned'>
-                                    <div style="width: 50%;">
-                                        <b>{{task.title}}</b>
-                                    </div>
-                                    <div style="width: 40%;">
-                                        Livreur: 
-                                        <b>{{ getEmployeById(task.employeId) }}</b>
-                                    </div>
-                                    <div 
-                                        style="width: 15%; background-color: seashell; border-radius: 10px; color: #3563ed; padding: 5px; cursor: pointer;">
-                                        <span (click)="unassignTaskFromEmpl(task.id, task.employeId)">
-                                           <b>Unassign</b> 
-                                        </span> 
-                                    </div>
-                            </li>
-                        }
-                    }   
-                }
-
-                @if (taskSwitcher() === 'COMPLETED') {
-                    @if (service.tasksCompleted().length === 0) {
-                        <li><h1>No tasks yet</h1></li>
-                    }
-                    @else {
-                        
-                        @for(task of service.tasksCompleted(); track $index){
-                            <li class='task-item-completed'>
-                                <div>
-                                    <b>{{ $index }}</b> : <span><b>{{task.title}}</b></span> === <span><b>{{task.description}}</b></span>
-                                </div>
-                                <div>
-                                    <span (click)="delete(task.id)" class="delete-completed-task-btn">
-                                        delete
-                                    </span>
-                                </div>    
-                            </li>
-                        }
-                    }   
-                }
-                
-            
-            </ul>
+        <div>
+            <app-tasks-modal />
         </div>
 
         <!-- Showing delivry guys list -->
@@ -134,54 +36,14 @@
     }
 
     @else {
+
+    <h1 style="margin-left: 5%;">Total: {{service.totalAmountLivreur()}} DH</h1>
+    
     <div class="container">
-        <div class="task-container">
-            <h2>My Tasks({{service.employeeAssignedTasks().length}})</h2>
-            <ul id="task-list">
-                @if (service.tasksAssigned().length === 0) {
-                    <li><h1>No tasks yet</h1></li>
-                }
-                @else {
-                    @for(task of service.employeeAssignedTasks(); track $index){
-                        <li class='user-assigned-task'>
-                            <div style="width: 80%;">
-                                <b>{{ $index }}</b> : <span><b>{{task.title}}</b></span>
-                            </div>
-                            <div class="mark-as-completed" (click)="markAsCompletedTask(task.id)">
-                                <span>Mark as Completed</span>
-                            </div>
-                        </li>
-                    }
-                }
-            </ul>
-        </div>
-
-
-        <div class="completed-task-container">
-            <h2>Completed Tasks({{service.employeeCompletedTasks().length}})</h2>
-            <ul id="task-list">
-                @if (service.employeeCompletedTasks().length === 0) {
-                    <li><h1>No tasks yet</h1></li>
-                }
-                @else {
-                    @for(task of service.employeeCompletedTasks(); track $index){
-                        <li class='completed-task-li'>
-                            <div>
-                                <b>{{ $index }}</b> : <span><b>{{task.title}}</b></span>
-                            </div>
-                            <div class="reassign-task" (click)="markAsUncompletedTask(task.id)">
-                                <b>Reassign</b>
-                            </div>
-                        </li>
-                    }
-                }
-            </ul>
-        </div>
+        <app-livreur-section />
     </div>    
-    }
 
-    <!-- Showing the dialog with users to assign task -->
-    <app-assign-dialog />
+    }
     
 <p-toast> </p-toast>
 </div>

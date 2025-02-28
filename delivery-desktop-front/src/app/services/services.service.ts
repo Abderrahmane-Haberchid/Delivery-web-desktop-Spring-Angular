@@ -20,8 +20,15 @@ export class ServicesService {
     tasksAssigned = signal<ITask[]>([]);
     tasksCompleted = signal<ITask[]>([]);
 
+    // Total command amount
+    totalAmount = signal<number|undefined>(0);
+
+    // Total commande amour per delivery guy
+    totalAmountLivreur = signal<number|undefined>(0);
+
     task = signal<ITask>({
-      title: '',
+      adresse: '',
+      price: 0,
       description: '',
       status: '',
       employeId: ''
