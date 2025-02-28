@@ -1,12 +1,9 @@
-import { Send } from './../../../node_modules/@types/express/node_modules/@types/express-serve-static-core/index.d';
 
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ITask } from '../interfaces/ITask';
 import { IUser } from '../interfaces/IUser';
-import SockJS from 'sockjs-client';
-import * as Stomp from 'stompjs';
 
 @Injectable({
   providedIn: 'root'
@@ -44,39 +41,9 @@ export class ServicesService {
     visible = signal<boolean>(false);
     // showing delivery guy details dialog
     showUserDialog = signal<boolean>(false);
-    
+
     taskToAssignId = signal<string|undefined>('') ;
     
-    private stompClient: any;
-    private rootUrl: string = "http://localhost:8081";
-
-    // connectSocket() {
-
-    //     const socket = new SockJS(this.rootUrl + '/socket-task');
-
-    //     this.stompClient = Stomp.over(socket);
-
-    //     this.stompClient.debug = () => { 
-    //         console.log("Error connecting socket to backend:");
-            
-    //     }; 
-  
-    //     this.stompClient.connect({}, () => {
-
-    //       this.stompClient.subscribe(`/topic/assigned-task`, (message:any) => {
-    //           console.log("==========> An Update received from backend", message.body);
-              
-    //       });
-  
-    //       this.stompClient.send('/app/test-msg',
-    //         JSON.stringify({ msg: "this is a msg from front via socket" ,action: 'connected' }));
-    //     }, 
-    //       (error:any) => {
-    //         console.log("Error while connecting to back");
-            
-    //       });
-
-    // }
 
 
   saveTask(task: ITask): Observable<ITask>{

@@ -4,6 +4,7 @@ import com.jiraClone.jiraclone.Enum.Status;
 import com.jiraClone.jiraclone.models.Task;
 import com.jiraClone.jiraclone.respository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -17,11 +18,12 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class KeycloakServiceImpl {
 
     private final Keycloak keycloak;
     private final TaskRepository taskRepository;
-    //private final SimpMessagingTemplate template;
+    private final SimpMessagingTemplate template;
     public List<UserRepresentation> getUsers(){
 
             RealmResource realmResource = keycloak.realm("delivery-manager");
@@ -65,7 +67,8 @@ public class KeycloakServiceImpl {
             task.setEmployeId(userId);
             taskRepository.save(task);
 
-            //template.convertAndSend("/topic/assigned-task", task);
+            template.convertAndSend("/topic/assigned-task", task);
+            log.info("WebSocket notfication sent now over /assigned-task");
 
         } catch (RuntimeException e) {
             throw new RuntimeException("An error has occured while assigning task to delivery guy"+e.getMessage());
@@ -102,6 +105,9 @@ public class KeycloakServiceImpl {
         task.setStatus(Status.UNASSIGNED);
         task.setEmployeId(null);
         taskRepository.save(task);
+
+        template.convertAndSend("/topic/assigned-task", task);
+        log.info("WebSocket notfication sent now over /assigned-task");
     }
 
 }

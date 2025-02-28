@@ -11,6 +11,8 @@ import { LivreurListComponent } from "../livreur-list/livreur-list.component";
 import { ToastModule } from 'primeng/toast';
 import { interval, Subscription } from 'rxjs';
 import { LivreurDetailsComponent } from "../livreur-details/livreur-details.component";
+import SockJS from 'sockjs-client';
+import * as Stomp from 'stompjs';
 
 @Component({
   standalone: true,
@@ -30,19 +32,22 @@ export class HomeComponent implements OnInit {
 
    private subscription: Subscription | undefined;
 
+   stompClient: any;
+    rootUrl: string = "http://localhost:8081";
+
     ngOnInit(): void {
 
       console.log("connecttion will start now");
 
-      this.subscription = interval(1000).subscribe({
-        next: () => {
-          this.getAllTasks();
-          this.getAllUser();
-        }
+      // this.subscription = interval(1000).subscribe({
+      //   next: () => {
+      //     this.getAllTasks();
+      //     this.getAllUser();
+      //   }
 
-      })
+      // })
       
-     // this.service.connectSocket();
+      this.connectSocket();
 
       this.getAllTasks(); 
         this.getAllUser();
@@ -53,6 +58,39 @@ export class HomeComponent implements OnInit {
         this.getUsername();
         this.getEmployeeId();
        
+  }
+
+  connectSocket() {
+    try {
+      if(this.keycloak.tokenParsed?.sub){
+        
+        const socket = new SockJS('http://localhost:8081/socket-task');
+
+        this.stompClient = Stomp.over(socket);
+
+        this.stompClient.connect({'Authorization': `Bearer ${this.keycloak.tokenParsed?.sub}`}, () => {
+          console.log('Connected to WebSocket');
+
+          this.stompClient.subscribe("/topic/assigned-task", (message: any) => {
+            console.log('==========> An Update received from backend', message.body);
+            this.getAllTasks();
+            this.getAllUser();
+          });
+
+        //   this.stompClient.send('/app/test-msg',
+        //     JSON.stringify({ msg: 'this is a msg from front via socket', action: 'connected' }));
+        // }, (error: any) => {
+        //   console.error('Error connecting to WebSocket:', error);
+        });
+
+        this.stompClient.debug = (msg: string) => {
+          console.debug('STOMP Debug:', msg);
+        };
+      }
+      
+    } catch (err) {
+      console.error('An error occurred while connecting:', err);
+    }
   }
   
 
