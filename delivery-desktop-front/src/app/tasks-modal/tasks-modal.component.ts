@@ -29,7 +29,7 @@ export class TasksModalComponent implements OnInit{
 
   date: Date | null = this.service.date();
 
-   // Signals for two-way binding
+   // Signals declaration for task interfacae
     adresse = signal<string>('');
     taskDescription = signal<string>('');
     price = signal<number|undefined>(undefined);
@@ -57,13 +57,17 @@ export class TasksModalComponent implements OnInit{
     }
 
     getTasksFiltredByDate(){
+      let createdAt: Date;
 
       if (this.service.tasksUnassigned() && this.service.date()) {
+
         this.service.tasksUnassignedFiltred.set(
+
           this.service.tasksUnassigned().filter((task) => 
            {
+            createdAt = task?.created_at ? new Date(task.created_at) : new Date();
             return (
-              task.created_at?.toLocaleDateString('fr-FR') === this.service.date()?.toLocaleDateString('fr-FR')
+                createdAt?.toLocaleDateString('fr-FR') === this.service.date()?.toLocaleDateString('fr-FR')
             );
           })   
         );
@@ -71,7 +75,8 @@ export class TasksModalComponent implements OnInit{
       else{
         this.service.tasksUnassignedFiltred.set(
           this.service.tasksUnassigned().filter((task) => {
-            return task.created_at?.toLocaleDateString('fr-FR') === new Date().toLocaleDateString('fr-FR');
+            createdAt = task?.created_at ? new Date(task.created_at) : new Date();
+            return createdAt?.toLocaleDateString('fr-FR') === new Date().toLocaleDateString('fr-FR');
           })
         );
       }
@@ -111,6 +116,11 @@ export class TasksModalComponent implements OnInit{
       this.service.saveTask(this.service.task()).subscribe({
         next: () => {
           this.getAllTasks(); 
+          
+          setTimeout(() => {
+            this.getTasksFiltredByDate();
+          }, 1000)
+          
           this.adresse.set(''); 
           this.price.set(0);
           this.taskDescription.set('');
