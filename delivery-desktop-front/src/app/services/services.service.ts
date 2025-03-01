@@ -15,10 +15,17 @@ export class ServicesService {
   BASE_URL: string = 'http://localhost:8081/api/v1/task';
   BASE_URL_USERS: string = 'http://localhost:8081/api/v1/users';
 
+  date = signal<Date|null>(null);
+
     // tasks signals
     tasksUnassigned = signal<ITask[]>([]);
     tasksAssigned = signal<ITask[]>([]);
     tasksCompleted = signal<ITask[]>([]);
+
+    // tasks signals filtered by date
+    tasksUnassignedFiltred = signal<ITask[]>([]);
+    tasksAssignedFiltred = signal<ITask[]>([]);
+    tasksCompletedFiltred = signal<ITask[]>([]);
 
     // Total command amount
     totalAmount = signal<number|undefined>(0);

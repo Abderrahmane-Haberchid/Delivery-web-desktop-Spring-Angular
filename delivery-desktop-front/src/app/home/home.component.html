@@ -17,12 +17,11 @@
        
     </div>
 
-    @if (userRoles?.includes('realm-admin')) {
+    @if (userRoles?.includes('realm-admin')) {  
 
-    <h1 style="margin-left: 5%;">Total: {{service.totalAmount()}} DH</h1>
     <div class="container">
 
-        <div>
+        <div style="width: 67%;">
             <app-tasks-modal />
         </div>
 

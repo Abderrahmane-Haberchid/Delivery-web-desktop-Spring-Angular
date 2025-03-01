@@ -1,4 +1,5 @@
-import { Component, inject, signal } from '@angular/core';
+
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { ServicesService } from '../services/services.service';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
@@ -6,17 +7,27 @@ import { DialogModule } from 'primeng/dialog';
 import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { AssignDialogComponent } from "../assign-dialog/assign-dialog.component";
+import { DatePickerModule } from 'primeng/datepicker';
 
 @Component({
   selector: 'app-tasks-modal',
-  imports: [FormsModule, DialogModule, ButtonModule, ToastModule, AssignDialogComponent],
+  imports: [FormsModule, DialogModule, ButtonModule, ToastModule, AssignDialogComponent, DatePickerModule],
   templateUrl: './tasks-modal.component.html',
   styleUrl: './tasks-modal.component.css'
 })
-export class TasksModalComponent {
+export class TasksModalComponent implements OnInit{
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.getTasksFiltredByDate();
+    }, 1000)
+
+  }
 
   service = inject(ServicesService);
   toast = inject(MessageService);
+
+  date: Date | null = this.service.date();
 
    // Signals for two-way binding
     adresse = signal<string>('');
@@ -24,6 +35,11 @@ export class TasksModalComponent {
     price = signal<number|undefined>(undefined);
 
     taskSwitcher = signal<'UNASSIGNED' | 'ASSIGNED' | 'COMPLETED'>('UNASSIGNED');
+
+    onChangeDatePicket(){
+      this.service.date.set(this.date);
+      this.getTasksFiltredByDate();
+    }
 
     
     showDialog(taskId: string|undefined) {
@@ -39,6 +55,27 @@ export class TasksModalComponent {
     taskSwitcherHandler(status: 'UNASSIGNED' | 'ASSIGNED' | 'COMPLETED') {
       this.taskSwitcher.set(status);
     }
+
+    getTasksFiltredByDate(){
+
+      if (this.service.tasksUnassigned() && this.service.date()) {
+        this.service.tasksUnassignedFiltred.set(
+          this.service.tasksUnassigned().filter((task) => 
+           {
+            return (
+              task.created_at?.toLocaleDateString('fr-FR') === this.service.date()?.toLocaleDateString('fr-FR')
+            );
+          })   
+        );
+      }
+      else{
+        this.service.tasksUnassignedFiltred.set(
+          this.service.tasksUnassigned().filter((task) => {
+            return task.created_at?.toLocaleDateString('fr-FR') === new Date().toLocaleDateString('fr-FR');
+          })
+        );
+      }
+  }
   
     unassignTaskFromEmpl(taskId: string|undefined, userId: string|undefined) {
       this.service.unassignTaskFromEmployee(taskId, userId).subscribe({
@@ -95,8 +132,10 @@ export class TasksModalComponent {
 
     getAllTasks() {
     
-      this.service.getAllTasks().subscribe({
+      this.service.getAllTasks()
+      .subscribe({
         next: (data) => {
+          // Here i filtre all tasks by date only if user pick date
           this.service.tasksUnassigned.set(data.filter((task) => task.status === 'UNASSIGNED'));
           this.service.tasksAssigned.set(data.filter((task) => task.status === 'ASSIGNED'));
           this.service.tasksCompleted.set(data.filter((task) => task.status === 'COMPLETED'));

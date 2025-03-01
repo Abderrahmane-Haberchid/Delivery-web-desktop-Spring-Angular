@@ -7,7 +7,8 @@ import java.util.Date;
 
 @Builder
 public record TaskDto(
-        String title,
+        String adresse,
+        double price,
         String description,
         Status status,
         Date created_at,

@@ -1,6 +1,6 @@
 
 import Keycloak from 'keycloak-js';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ServicesService } from '../services/services.service';
 import { DialogModule } from 'primeng/dialog';
@@ -8,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
 import { LivreurListComponent } from "../livreur-list/livreur-list.component";
 import { ToastModule } from 'primeng/toast';
-import { Subscription } from 'rxjs';
 import { LivreurDetailsComponent } from "../livreur-details/livreur-details.component";
 import SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
@@ -34,18 +33,16 @@ export class HomeComponent implements OnInit {
 
    userRoles: string[] = [];
 
-   private subscription: Subscription | undefined;
-
    stompClient: any;
-    rootUrl: string = "http://localhost:8081";
+   rootUrl: string = "http://localhost:8081";
 
     ngOnInit(): void {
       
       this.connectSocket();
 
       this.getAllTasks(); 
-        this.getAllUser();
-        
+      this.getAllUser();
+
         if(this.keycloak?.tokenParsed && this.keycloak?.tokenParsed?.resource_access){
           this.userRoles = this.keycloak?.tokenParsed?.resource_access["realm-management"]?.roles;
         }
@@ -58,7 +55,7 @@ export class HomeComponent implements OnInit {
     try {
       if(this.keycloak.tokenParsed?.sub){
         
-        const socket = new SockJS('http://localhost:8081/socket-task');
+        const socket = new SockJS(`${this.rootUrl}/socket-task`);
 
         this.stompClient = Stomp.over(socket);
 
@@ -170,6 +167,6 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnDestroy(){
-    this.subscription?.unsubscribe();
+    
   }
 }

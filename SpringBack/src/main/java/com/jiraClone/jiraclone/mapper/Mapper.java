@@ -10,8 +10,9 @@ import java.util.Date;
 public class Mapper {
     public Task taskDtotoModel(TaskDto taskDto){
         return Task.builder()
-                .title(taskDto.title())
+                .adresse(taskDto.adresse())
                 .description(taskDto.description())
+                .price(taskDto.price())
                 .status(taskDto.status())
                 .created_at(new Date())
                 .updated_at(taskDto.updated_at())
@@ -20,7 +21,8 @@ public class Mapper {
 
     public TaskDto taskToDto(Task task){
         return TaskDto.builder()
-                .title(task.getTitle())
+                .adresse(task.getAdresse())
+                .price(task.getPrice())
                 .description(task.getDescription())
                 .status(task.getStatus())
                 .created_at(task.getCreated_at())

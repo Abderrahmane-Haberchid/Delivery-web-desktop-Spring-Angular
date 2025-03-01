@@ -1,5 +1,19 @@
+
+<div style="width: 60%; display: flex; justify-content: space-between; align-items: center; margin-top: 40px;">
+    <h1 style="margin-left: 5%;">Total: {{service.totalAmount()}} DH</h1>
+
+    <h3>Date:<p-datepicker [(ngModel)]="date" (ngModelChange)="onChangeDatePicket()" />
+    <br />
+    {{ service.date()?.toLocaleDateString('fr-FR') }}
+    </h3>
+
+</div>  
+
 <div class="task-container">
-    <h2>Ajouter une commande</h2>
+    <div>
+        <h2>Ajouter une commande</h2>
+    </div>
+    
     <div class="task-form">
         <input type="text" placeholder="Adresse de livraison..." [(ngModel)]="adresse">
         <input type="text" placeholder="Prix de la commande..." [(ngModel)]="price">
@@ -18,27 +32,27 @@
     <div class="task-list-header">
         <h3 (click)="taskSwitcherHandler('UNASSIGNED')"
             [style]="taskSwitcher() === 'UNASSIGNED' ? 'text-decoration:underline' : 'text-decoration:none'">
-            Commandes à Assigner ({{service.tasksUnassigned().length}}) 
+            À Assigner ({{service.tasksUnassignedFiltred().length}}) 
         </h3>
         <h3 (click)="taskSwitcherHandler('ASSIGNED')" 
             [style]="taskSwitcher() === 'ASSIGNED' ? 'text-decoration:underline' : 'text-decoration:none'">
-            Commandes Assignées ({{service.tasksAssigned().length}}) 
+            Assignées ({{service.tasksAssigned().length}}) 
         </h3>
         <h3 (click)="taskSwitcherHandler('COMPLETED')" 
             [style]="taskSwitcher() === 'COMPLETED' ? 'text-decoration:underline' : 'text-decoration:none'">
-            Commande Complétée ({{service.tasksCompleted().length}}) 
+            Complétée ({{service.tasksCompleted().length}}) 
         </h3>
     </div>
     
     <ul id="task-list">
         
         @if (taskSwitcher() === 'UNASSIGNED') {
-            @if (service.tasksUnassigned().length === 0) {
+            @if (service.tasksUnassignedFiltred().length === 0) {
                 <li><h1>Aucune commande...</h1></li>
             }
             @else {
                 
-                @for(task of service.tasksUnassigned(); track $index){
+                @for(task of service.tasksUnassignedFiltred(); track $index){
                     <li class='task-item-unassigned'>
                         <div class="div-task-item">
                             <div class="task-body">

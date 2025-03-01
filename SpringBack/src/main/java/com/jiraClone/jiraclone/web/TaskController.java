@@ -92,11 +92,4 @@ public class TaskController {
             return new ResponseEntity<>(task, HttpStatus.BAD_REQUEST);
 
     }
-
-//    @MessageMapping("/test-msg")
-//    @SendTo("/topic/test")
-//    public String testMethod(String msg){
-//        System.out.println("msg = " + msg);
-//        return "Hello your test is working perfelctly";
-//    }
 }

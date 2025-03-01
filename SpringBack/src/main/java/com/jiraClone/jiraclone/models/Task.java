@@ -14,8 +14,9 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String title;
+    private double price;
     private String description;
+    private String adresse;
     @Enumerated(value = EnumType.STRING)
     private Status status;
     private Date created_at;

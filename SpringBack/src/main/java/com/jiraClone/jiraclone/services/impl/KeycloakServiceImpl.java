@@ -68,7 +68,6 @@ public class KeycloakServiceImpl {
             taskRepository.save(task);
 
             template.convertAndSend("/topic/assigned-task", task);
-            log.info("WebSocket notfication sent now over /assigned-task");
 
         } catch (RuntimeException e) {
             throw new RuntimeException("An error has occured while assigning task to delivery guy"+e.getMessage());
@@ -107,7 +106,6 @@ public class KeycloakServiceImpl {
         taskRepository.save(task);
 
         template.convertAndSend("/topic/assigned-task", task);
-        log.info("WebSocket notfication sent now over /assigned-task");
     }
 
 }

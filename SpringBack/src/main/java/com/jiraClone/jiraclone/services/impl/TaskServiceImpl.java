@@ -12,6 +12,8 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final Mapper mapper;
     private final Keycloak keycloak;
+    private final SimpMessagingTemplate template;
 
 
     @Override
@@ -70,6 +73,8 @@ public class TaskServiceImpl implements TaskService {
                 user.setAttributes(attributes);
 
                 usersResource.get(task.getEmployeId()).update(user);
+
+                template.convertAndSend("/topic/assigned-task", task);
             } catch (NotFoundException e) {
                 throw new NotFoundException("User doesn't have any task with this id: "+task.getId() + e.getMessage());
             }
@@ -109,6 +114,9 @@ public class TaskServiceImpl implements TaskService {
 
                 // Update the user in Keycloak
                 usersResource.get(task.getEmployeId()).update(user);
+
+                template.convertAndSend("/topic/assigned-task", task);
+
             } catch (Exception e) {
                 throw new RuntimeException("Error occured while adding task id to user "+e.getMessage());
             }
