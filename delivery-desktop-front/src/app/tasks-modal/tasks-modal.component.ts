@@ -1,5 +1,5 @@
 
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { ServicesService } from '../services/services.service';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { ButtonModule } from 'primeng/button';
 import { AssignDialogComponent } from "../assign-dialog/assign-dialog.component";
 import { DatePickerModule } from 'primeng/datepicker';
+import { ITask } from '../interfaces/ITask';
 
 @Component({
   selector: 'app-tasks-modal',
@@ -17,17 +18,16 @@ import { DatePickerModule } from 'primeng/datepicker';
 })
 export class TasksModalComponent implements OnInit{
 
-  ngOnInit(): void {
-    setTimeout(() => {
-      this.getTasksFiltredByDate();
-    }, 1000)
-
-  }
-
   service = inject(ServicesService);
   toast = inject(MessageService);
 
-  date: Date | null = this.service.date();
+  ngOnInit(): void {
+    this.getAllTasks();
+  }
+
+  date: Date | null = new Date();
+
+  tasksCompletedFiltred = signal<ITask[]>(this.service.tasksCompleted());
 
    // Signals declaration for task interfacae
     adresse = signal<string>('');
@@ -37,7 +37,6 @@ export class TasksModalComponent implements OnInit{
     taskSwitcher = signal<'UNASSIGNED' | 'ASSIGNED' | 'COMPLETED'>('UNASSIGNED');
 
     onChangeDatePicket(){
-      this.service.date.set(this.date);
       this.getTasksFiltredByDate();
     }
 
@@ -57,29 +56,15 @@ export class TasksModalComponent implements OnInit{
     }
 
     getTasksFiltredByDate(){
-      let createdAt: Date;
-
-      if (this.service.tasksUnassigned() && this.service.date()) {
-
-        this.service.tasksUnassignedFiltred.set(
-
-          this.service.tasksUnassigned().filter((task) => 
-           {
-            createdAt = task?.created_at ? new Date(task.created_at) : new Date();
-            return (
-                createdAt?.toLocaleDateString('fr-FR') === this.service.date()?.toLocaleDateString('fr-FR')
-            );
-          })   
-        );
-      }
-      else{
-        this.service.tasksUnassignedFiltred.set(
-          this.service.tasksUnassigned().filter((task) => {
-            createdAt = task?.created_at ? new Date(task.created_at) : new Date();
-            return createdAt?.toLocaleDateString('fr-FR') === new Date().toLocaleDateString('fr-FR');
-          })
-        );
-      }
+      if (this.service.tasksCompleted() && this.date) {
+        
+        let newListTask = this.service.tasksCompleted().filter((task) => {
+            let taskDate = task?.updated_at ? new Date(task.updated_at).toLocaleDateString('fr-FR') : '';
+               return taskDate === this.date?.toLocaleDateString('fr-FR') 
+      })
+      this.tasksCompletedFiltred.set(newListTask);
+      this.countTotalMoney();
+    }
   }
   
     unassignTaskFromEmpl(taskId: string|undefined, userId: string|undefined) {
@@ -115,12 +100,7 @@ export class TasksModalComponent implements OnInit{
   
       this.service.saveTask(this.service.task()).subscribe({
         next: () => {
-          this.getAllTasks(); 
-          
-          setTimeout(() => {
-            this.getTasksFiltredByDate();
-          }, 1000)
-          
+          this.getAllTasks();
           this.adresse.set(''); 
           this.price.set(0);
           this.taskDescription.set('');
@@ -140,39 +120,67 @@ export class TasksModalComponent implements OnInit{
       });
     }
 
+
+    delete(taskId: string|undefined) {
+      this.service.deleteTask(taskId).subscribe({
+          next: () => {
+            this.getAllTasks();
+            this.toast.add({
+              severity: 'info',
+              summary: 'Info',
+              detail: 'Commande Supprimée !'
+            })
+          },
+          error: () => {
+            this.toast.add({
+              severity: 'error',
+              summary: 'Erreur',
+              detail: 'Pas possible supprimer la commande, merci de réessayer !'
+            })
+            }
+      });
+    }
+
+
+    countTotalMoney(){
+            let total:number = 0;
+            // Here we calculte total amount for completed commande only
+            this.tasksCompletedFiltred().map((task) => total += task?.price || 0)
+            this.service.totalAmount.set(total);
+    
+            let totalLivreur:number = 0;
+            // Here we calculte the total amount commande per delivery guy
+            this.service.employeeCompletedTasks().map((task) => totalLivreur+= task?.price || 0);
+            this.service.totalAmountLivreur.set(totalLivreur);
+
+            console.log("List ready to count money: ", this.tasksCompletedFiltred().length);
+            
+    }
+
     getAllTasks() {
     
       this.service.getAllTasks()
-      .subscribe({
-        next: (data) => {
-          // Here i filtre all tasks by date only if user pick date
-          this.service.tasksUnassigned.set(data.filter((task) => task.status === 'UNASSIGNED'));
-          this.service.tasksAssigned.set(data.filter((task) => task.status === 'ASSIGNED'));
-          this.service.tasksCompleted.set(data.filter((task) => task.status === 'COMPLETED'));
-          
-          // List of tasks assigned to the current employee
-          this.service.employeeAssignedTasks.set(
-                    this.service.tasksAssigned()
-                            .filter((task) =>  
-                              task.employeId === this.service.employeeId() && task.status === 'ASSIGNED'
-                            )
-          ); 
-          // List of tasks completed by the current employee
-          this.service.employeeCompletedTasks.set(
-                    this.service.tasksCompleted()
-                            .filter((task) =>  
-                              task.employeId === this.service.employeeId() && task.status === 'COMPLETED'
-                            )
-          );
-          let total:number = 0;
-          // Here we calculte total amount for completed commande only
-          this.service.tasksCompleted().map((task) => total += task?.price || 0)
-          this.service.totalAmount.set(total);
-  
-          let totalLivreur:number = 0;
-          // Here we calculte the total amount commande per delivery guy
-          this.service.employeeCompletedTasks().map((task) => totalLivreur+= task?.price || 0);
-          this.service.totalAmountLivreur.set(totalLivreur);
+        .subscribe({
+          next: (data) => {
+            // Here i filtre all tasks by date only if user pick date
+            this.service.tasksUnassigned.set(data.filter((task) => task.status === 'UNASSIGNED'));
+            this.service.tasksAssigned.set(data.filter((task) => task.status === 'ASSIGNED'));
+            this.service.tasksCompleted.set(data.filter((task) => task.status === 'COMPLETED'));
+            
+            // List of tasks assigned to the current employee
+            this.service.employeeAssignedTasks.set(
+                      this.service.tasksAssigned()
+                              .filter((task) =>  
+                                task.employeId === this.service.employeeId() && task.status === 'ASSIGNED'
+                              )
+            ); 
+            // List of tasks completed by the current employee
+            this.service.employeeCompletedTasks.set(
+                      this.service.tasksCompleted()
+                              .filter((task) =>  
+                                task.employeId === this.service.employeeId() && task.status === 'COMPLETED'
+                              )
+            );
   
         },
         error: () => {
@@ -183,6 +191,7 @@ export class TasksModalComponent implements OnInit{
           })
         }
       });
+      
     }
   
     getAllUser(){
@@ -207,26 +216,6 @@ export class TasksModalComponent implements OnInit{
             detail: 'Pas possible de charger les livreurs, merci de réessayer !'
           })
         }
-      });
-    }
-
-    delete(taskId: string|undefined) {
-      this.service.deleteTask(taskId).subscribe({
-          next: () => {
-            this.getAllTasks();
-            this.toast.add({
-              severity: 'info',
-              summary: 'Info',
-              detail: 'Commande Supprimée !'
-            })
-          },
-          error: () => {
-            this.toast.add({
-              severity: 'error',
-              summary: 'Erreur',
-              detail: 'Pas possible supprimer la commande, merci de réessayer !'
-            })
-            }
       });
     }
 

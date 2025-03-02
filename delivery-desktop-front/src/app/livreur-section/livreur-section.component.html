@@ -5,7 +5,7 @@
         <h2>Mes Commandes({{service.employeeAssignedTasks().length}})</h2>
         <ul id="task-list">
             @if (service.tasksAssigned().length === 0) {
-                <li><h1>No tasks yet</h1></li>
+                <li><h1>Aucune commande à livrer...</h1></li>
             }
             @else {
                 @for(task of service.employeeAssignedTasks(); track $index){
@@ -36,7 +36,7 @@
                             <b>{{ $index }}</b> : <span><b>{{task.description}}</b></span>
                         </div>
                         <div class="reassign-task" (click)="markAsUncompletedTask(task.id)">
-                            <b>Réassigner</b>
+                            <b>Annuler</b>
                         </div>
                     </li>
                 }

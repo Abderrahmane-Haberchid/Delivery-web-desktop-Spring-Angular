@@ -57,6 +57,7 @@ public class TaskServiceImpl implements TaskService {
         try {
             Task task = taskRepository.findById(id).get();
             task.setStatus(Status.COMPLETED);
+            task.setUpdated_at(new Date());
             taskRepository.save(task);
 
             RealmResource realmResource = keycloak.realm("delivery-manager");
@@ -90,6 +91,7 @@ public class TaskServiceImpl implements TaskService {
         try {
             Task task = taskRepository.findById(id).get();
             task.setStatus(Status.ASSIGNED);
+            task.setUpdated_at(null);
             taskRepository.save(task);
 
             RealmResource realmResource = keycloak.realm("delivery-manager");

@@ -77,10 +77,10 @@ button:hover {
     gap: 20px;
 }
 .task-body{
-    width: 70%;
+    width: 85%;
 }
 .task-actions-btn{
-    width: 30%;
+    width: 15%;
 }
 
 ul li{
